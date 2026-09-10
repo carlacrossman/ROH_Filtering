@@ -1,0 +1,228 @@
+```{r}
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(tidyr)
+library(data.table)
+
+breaks <- 10^(-10:10)
+minor_breaks <- rep(5, 21)*(10^rep(-10:10, each=9))
+
+
+high_roh_bcftools <- read.table('HIGH_cod_filtered_variants_ROH.txt', header=TRUE)
+high_roh_bcftools$cat <- "HIGH"
+high_roh_bcftools_min10kb <-high_roh_bcftools[high_roh_bcftools$Length>=10000,]
+
+low_roh_bcftools <- read.table('LOW_cod_filtered_variants_ROH.txt', header=TRUE)
+low_roh_bcftools$cat <- "LOW"
+low_roh_bcftools_min10kb <-low_roh_bcftools[low_roh_bcftools$Length>=10000,]
+
+
+ROH_df <- rbind(high_roh_bcftools, low_roh_bcftools)
+
+ROH_df_min10kb <- ROH_df[ROH_df$Length>=10000,]
+
+ROH_len_variants <-ggplot(high_roh_bcftools_min10kb, aes(x = Length, group=Sample)) +
+  geom_step(stat="bin", bins=20, direction="mid", aes(colour="HIGH"), linewidth = 1) + 
+  geom_step(data=low_roh_bcftools_min10kb, aes(x=Length, colour="LOW"), stat="bin", bins=20, direction="mid", linewidth = 1) + 
+  theme_bw() +
+  scale_x_continuous(trans='log10', label=comma, breaks = breaks, minor_breaks = minor_breaks) +
+  theme(axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) +
+  scale_colour_manual(name="Variants", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Length of ROH") +
+  ylab("Number of ROHs") +
+  annotation_logticks(sides="b")
+
+ROH_len_variants
+```
+
+```{r}
+high_all_roh_bcftools <- read.table('HIGH_cod_filtered_allsites_ROH.txt', header=TRUE)
+high_all_roh_bcftools$cat <- "HIGH"
+high_all_roh_bcftools_min10kb <-high_all_roh_bcftools[high_all_roh_bcftools$Length>=10000,]
+
+low_all_roh_bcftools <- read.table('LOW_cod_filtered_allsites_ROH.txt', header=TRUE)
+low_all_roh_bcftools$cat <- "LOW"
+low_all_roh_bcftools_min10kb <-low_all_roh_bcftools[low_all_roh_bcftools$Length>=10000,]
+
+
+ROH_all_df <- rbind(high_all_roh_bcftools, low_all_roh_bcftools)
+
+ROH_all_df_min10kb <- ROH_all_df[ROH_all_df$Length>=10000,]
+
+ROH_len_all <-ggplot(high_all_roh_bcftools_min10kb, aes(x = Length, group=Sample)) +
+  geom_step(stat="bin", bins=20, direction="mid", aes(colour="HIGH"), linewidth = 1) + 
+  geom_step(data=low_all_roh_bcftools_min10kb, aes(x=Length, colour="LOW"), stat="bin", bins=20, direction="mid", linewidth = 1) + 
+  theme_bw() +
+  scale_x_continuous(trans='log10', label=comma, breaks = breaks, minor_breaks = minor_breaks) +
+  theme(axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) +
+  scale_colour_manual(name="ALL SITES", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Length of ROH") +
+  ylab("Number of ROHs") +
+  annotation_logticks(sides="b")
+
+ROH_len_all
+```
+
+
+```{r}
+high_ind_roh_bcftools <- read.table('high_variants_cod_ROH_ind', header=FALSE)
+low_ind_roh_bcftools <- read.table('low_variants_cod_ROH_ind', header=FALSE)
+high_all_ind_roh_bcftools <- read.table('high_allsites_cod_ROH_ind', header=FALSE)
+low_all_ind_roh_bcftools <- read.table('low_allsites_cod_ROH_ind', header=FALSE)
+
+high_ind_roh_bcftools$cat <- "HIGH"
+low_ind_roh_bcftools$cat <- "LOW"
+high_all_ind_roh_bcftools$cat <- "HIGH"
+low_all_ind_roh_bcftools$cat <- "LOW"
+high_ind_roh_bcftools$data <- "variants"
+low_ind_roh_bcftools$data <- "variants"
+high_all_ind_roh_bcftools$data <- "allsites"
+low_all_ind_roh_bcftools$data <- "allsites"
+
+ind_ROH_df <- rbind(high_ind_roh_bcftools, low_ind_roh_bcftools, high_all_ind_roh_bcftools, low_all_ind_roh_bcftools)
+colnames(ind_ROH_df) <- c("Sample", "FROH_1kb", "Num", "Length", "Filters", "Data")
+ind_ROH_df <- ind_ROH_df %>%
+                  mutate(Group = paste(Filters, Data, sep = "_"))
+
+ggplot(ind_ROH_df) +
+  geom_boxplot(aes(x = Group, y = FROH_1kb, fill = Filters)) +
+  scale_fill_manual(name="Filters", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Filtering regime")
+```
+
+
+```{r}
+library(detectRUNS)
+  
+slidingRuns_high_all <- slidingRUNS.run(
+  genotypeFile = "./cod_filtered_allsites_high.ped", 
+  mapFile = "./cod_filtered_allsites_high.map", 
+  windowSize = 15, 
+  threshold = 0.05,
+  minSNP = 20, 
+  ROHet = FALSE, 
+  maxOppWindow = 1, 
+  maxMissWindow = 1,
+  maxGap = 10^6, 
+  minLengthBps = 100000, 
+  minDensity = 1/10^3, # SNP/kbps
+  maxOppRun = NULL,
+  maxMissRun = NULL
+) 
+
+high_all_roh_ind <- slidingRuns_high_all %>% group_by(group) %>% summarise(total_length=sum(lengthBps))%>% mutate(FROH=(total_length/653355439))
+
+#####
+
+slidingRuns_low_all <- slidingRUNS.run(
+  genotypeFile = "./cod_filtered_allsites_low.ped", 
+  mapFile = "./cod_filtered_allsites_low.map", 
+  windowSize = 15, 
+  threshold = 0.05,
+  minSNP = 20, 
+  ROHet = FALSE, 
+  maxOppWindow = 1, 
+  maxMissWindow = 1,
+  maxGap = 10^6, 
+  minLengthBps = 100000, 
+  minDensity = 1/10^3, # SNP/kbps
+  maxOppRun = NULL,
+  maxMissRun = NULL
+) 
+
+low_all_roh_ind <- slidingRuns_low_all %>% group_by(group) %>% summarise(total_length=sum(lengthBps))%>% mutate(FROH=(total_length/653355439))
+
+########
+
+slidingRuns_high_var <- slidingRUNS.run(
+  genotypeFile = "./cod_filtered_variants_high.ped", 
+  mapFile = "./cod_filtered_variants_high.map", 
+  windowSize = 15, 
+  threshold = 0.05,
+  minSNP = 20, 
+  ROHet = FALSE, 
+  maxOppWindow = 1, 
+  maxMissWindow = 1,
+  maxGap = 10^6, 
+  minLengthBps = 100000, 
+  minDensity = 1/10^3, # SNP/kbps
+  maxOppRun = NULL,
+  maxMissRun = NULL
+) 
+
+high_variants_roh_ind <- slidingRuns_high_var %>% group_by(group) %>% summarise(total_length=sum(lengthBps))%>% mutate(FROH=(total_length/653355439))
+
+
+######
+
+slidingRuns_low_var <- slidingRUNS.run(
+  genotypeFile = "./cod_filtered_variants_low.ped", 
+  mapFile = "./cod_filtered_variants_low.map", 
+  windowSize = 15, 
+  threshold = 0.05,
+  minSNP = 20, 
+  ROHet = FALSE, 
+  maxOppWindow = 1, 
+  maxMissWindow = 1,
+  maxGap = 10^6, 
+  minLengthBps = 100000, 
+  minDensity = 1/10^3, # SNP/kbps
+  maxOppRun = NULL,
+  maxMissRun = NULL
+) 
+
+low_variants_roh_ind <- slidingRuns_low_var %>% group_by(group) %>% summarise(total_length=sum(lengthBps)) %>% mutate(FROH=(total_length/653355439))
+```
+
+```{r}
+
+low_variants_roh_ind$cat <- "LOW"
+high_variants_roh_ind$cat <- "HIGH"
+low_all_roh_ind$cat <- "LOW"
+high_all_roh_ind$cat <- "HIGH"
+low_variants_roh_ind$data <- "var"
+high_variants_roh_ind$data <- "var"
+low_all_roh_ind$data <- "all"
+high_all_roh_ind$data <- "all"
+
+
+detectRuns_ROH_df <- rbind(high_all_roh_ind, low_all_roh_ind, high_variants_roh_ind, low_variants_roh_ind)
+colnames(detectRuns_ROH_df) <- c("Sample", "Total_Length", "FROH_1kb", "Filters", "Data")
+detectRuns_ROH_df <- detectRuns_ROH_df %>%
+                  mutate(Group = paste(Filters, Data, sep = "_"))
+
+ggplot(detectRuns_ROH_df) +
+  geom_boxplot(aes(x = Group, y = FROH_1kb, fill = Filters)) +
+  scale_fill_manual(name="Filters", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Filtering regime")
+
+```
+
+
+```{r}
+detectRuns_ROH_len_var <-ggplot(slidingRuns_low_var, aes(x = lengthBps, group=group)) +
+  geom_step(stat="bin", bins=20, direction="mid", aes(colour="LOW"), linewidth = 1) + 
+  geom_step(data=slidingRuns_high_var, aes(x=lengthBps, colour="HIGH"), stat="bin", bins=20, direction="mid", linewidth = 1) + 
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) +
+  scale_colour_manual(name="Variants", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Length of ROH") +
+  ylab("Number of ROHs")
+
+
+detectRuns_ROH_len_var
+```
+```{r}
+detectRuns_ROH_len_all <-ggplot(slidingRuns_low_all, aes(x = lengthBps, group=group)) +
+  geom_step(stat="bin", bins=20, direction="mid", aes(colour="LOW"), linewidth = 1) + 
+  geom_step(data=slidingRuns_high_all, aes(x=lengthBps, colour="HIGH"), stat="bin", bins=20, direction="mid", linewidth = 1) + 
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14)) +
+  scale_colour_manual(name="ALL SITES", values = c("HIGH"= "#f1a340","LOW"="#998ec3")) +
+  xlab("Length of ROH") +
+  ylab("Number of ROHs")
+
+
+detectRuns_ROH_len_all
+```

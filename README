@@ -1,0 +1,7 @@
+This is a working repository for the mini-ROH review paper.
+
+scripts/  - contains relevant scripts for running the analysis.
+data/  - contains relevant vcf and/or other data files for plotting.
+
+NOTE: As of Sept 10, the data files uploaded were preliminary ones I used in the proof of concept stage. These will be updated ASAP.
+
