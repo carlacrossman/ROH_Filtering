@@ -1,8 +1,11 @@
 #!/bin/bash
 
-################################################################
-# Load data file and relevant information needed for each sample
-################################################################
+#############################################
+# Calculate the mean coverage for each sample 
+# across each chromosome.
+# Calculate the mean of the autosomes scaled 
+# by chromosome length in excel.
+#############################################
 
 
 for ITERATOR in 2..20

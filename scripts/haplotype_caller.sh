@@ -7,18 +7,38 @@
 #SBATCH --mem=25G
 #SBATCH --time=1:00:00
 
+################################################################
+# Load data file and relevant information needed for each sample
+################################################################
+
 LIST=$(sed -n "${SLURM_ARRAY_TASK_ID}p" data_list)
 SAMPLE=$(echo $LIST | awk '{print $1}')
 SCAFFOLD=$(echo $LIST | awk '{print $2}')
 
+########################
+# Load necessary modules
+########################
+
+module load gatk/4.6.1.0
+
+##########################################
+# Specify memory allocation for JAVA tools
+##########################################
+
 export JAVA_TOOL_OPTIONS="-Xmx24G"
 
-#gatk --java-options "-Xmx24g" HaplotypeCaller \
-#  -R ../reference/GCF_902167405.1_gadMor3.0_genomic.fna \
-#  -I cod_${SAMPLE}_paired-nodups_high.bam \
-#  -O ../vcf/${SAMPLE}_${SCAFFOLD}_high_whole.g.vcf.gz \
-#  -ERC GVCF \
-#  -L ${SCAFFOLD}
+######################################################
+# Call haplotypes with GATK for each scaffold
+# Repeat for each species with proper reference genome
+######################################################
+
+
+gatk --java-options "-Xmx24g" HaplotypeCaller \
+  -R ../reference/GCF_902167405.1_gadMor3.0_genomic.fna \
+  -I cod_${SAMPLE}_paired-nodups_high.bam \
+  -O ../vcf/${SAMPLE}_${SCAFFOLD}_high_whole.g.vcf.gz \
+  -ERC GVCF \
+  -L ${SCAFFOLD}
 
 gatk --java-options "-Xmx24g" HaplotypeCaller \
   -R ../reference/GCF_902167405.1_gadMor3.0_genomic.fna \

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#############################################
+# Using bcftools to merge the raw vcf files
+# generated for each scaffold into a single 
+# file for each species and filtering regime.
+#############################################
+
+module load bcftool/1.22
+
+
+bcftools concat cod_NC_044048.1_high.vcf.gz cod_NC_044049.1_high.vcf.gz cod_NC_044050.1_high.vcf.gz cod_NC_044051.1_high.vcf.gz cod_NC_044052.1_high.vcf.gz cod_NC_044053.1_high.vcf.gz cod_NC_044054.1_high.vcf.gz cod_NC_044055.1_high.vcf.gz cod_NC_044056.1_high.vcf.gz cod_NC_044057.1_high.vcf.gz cod_NC_044058.1_high.vcf.gz cod_NC_044059.1_high.vcf.gz cod_NC_044060.1_high.vcf.gz cod_NC_044061.1_high.vcf.gz cod_NC_044062.1_high.vcf.gz cod_NC_044063.1_high.vcf.gz cod_NC_044064.1_high.vcf.gz cod_NC_044065.1_high.vcf.gz cod_NC_044066.1_high.vcf.gz cod_NC_044067.1_high.vcf.gz cod_NC_044068.1_high.vcf.gz cod_NC_044069.1_high.vcf.gz cod_NC_044070.1_high.vcf.gz -Oz -o merged_cod_raw_allsites_high.vcf.gz
+
+bcftools concat cod_NC_044048.1_low.vcf.gz cod_NC_044049.1_low.vcf.gz cod_NC_044050.1_low.vcf.gz cod_NC_044051.1_low.vcf.gz cod_NC_044052.1_low.vcf.gz cod_NC_044053.1_low.vcf.gz cod_NC_044054.1_low.vcf.gz cod_NC_044055.1_low.vcf.gz cod_NC_044056.1_low.vcf.gz cod_NC_044057.1_low.vcf.gz cod_NC_044058.1_low.vcf.gz cod_NC_044059.1_low.vcf.gz cod_NC_044060.1_low.vcf.gz cod_NC_044061.1_low.vcf.gz cod_NC_044062.1_low.vcf.gz cod_NC_044063.1_low.vcf.gz cod_NC_044064.1_low.vcf.gz cod_NC_044065.1_low.vcf.gz cod_NC_044066.1_low.vcf.gz cod_NC_044067.1_low.vcf.gz cod_NC_044068.1_low.vcf.gz cod_NC_044069.1_low.vcf.gz cod_NC_044070.1_low.vcf.gz -Oz -o merged_cod_raw_allsites_low.vcf.gz
+
+bcftools concat rattlesnake_CM078115.1_high.vcf.gz rattlesnake_CM078116.1_high.vcf.gz rattlesnake_CM078117.1_high.vcf.gz rattlesnake_CM078118.1_high.vcf.gz rattlesnake_CM078119.1_high.vcf.gz rattlesnake_CM078120.1_high.vcf.gz rattlesnake_CM078121.1_high.vcf.gz rattlesnake_CM078122.1_high.vcf.gz rattlesnake_CM078123.1_high.vcf.gz rattlesnake_CM078124.1_high.vcf.gz rattlesnake_CM078125.1_high.vcf.gz rattlesnake_CM078126.1_high.vcf.gz rattlesnake_CM078127.1_high.vcf.gz rattlesnake_CM078128.1_high.vcf.gz rattlesnake_CM078129.1_high.vcf.gz rattlesnake_CM078130.1_high.vcf.gz rattlesnake_CM078131.1_high.vcf.gz -Oz -o merged_rattlesnake_raw_allsites_high.vcf.gz
+
+
+bcftools concat rattlesnake_CM078115.1_low.vcf.gz rattlesnake_CM078116.1_low.vcf.gz rattlesnake_CM078117.1_low.vcf.gz rattlesnake_CM078118.1_low.vcf.gz rattlesnake_CM078119.1_low.vcf.gz rattlesnake_CM078120.1_low.vcf.gz rattlesnake_CM078121.1_low.vcf.gz rattlesnake_CM078122.1_low.vcf.gz rattlesnake_CM078123.1_low.vcf.gz rattlesnake_CM078124.1_low.vcf.gz rattlesnake_CM078125.1_low.vcf.gz rattlesnake_CM078126.1_low.vcf.gz rattlesnake_CM078127.1_low.vcf.gz rattlesnake_CM078128.1_low.vcf.gz rattlesnake_CM078129.1_low.vcf.gz rattlesnake_CM078130.1_low.vcf.gz rattlesnake_CM078131.1_low.vcf.gz -Oz -o merged_rattlesnake_raw_allsites_low.vcf.gz
+
+
+bcftools concat rightwhale_NC_083716.1_low.vcf.gz rightwhale_NC_083717.1_low.vcf.gz rightwhale_NC_083718.1_low.vcf.gz rightwhale_NC_083719.1_low.vcf.gz rightwhale_NC_083720.1_low.vcf.gz rightwhale_NC_083721.1_low.vcf.gz rightwhale_NC_083722.1_low.vcf.gz rightwhale_NC_083723.1_low.vcf.gz rightwhale_NC_083724.1_low.vcf.gz rightwhale_NC_083725.1_low.vcf.gz rightwhale_NC_083726.1_low.vcf.gz rightwhale_NC_083727.1_low.vcf.gz rightwhale_NC_083728.1_low.vcf.gz rightwhale_NC_083729.1_low.vcf.gz rightwhale_NC_083730.1_low.vcf.gz rightwhale_NC_083731.1_low.vcf.gz rightwhale_NC_083732.1_low.vcf.gz rightwhale_NC_083733.1_low.vcf.gz rightwhale_NC_083734.1_low.vcf.gz rightwhale_NC_083735.1_low.vcf.gz  -Oz -o merged_rightwhale_raw_allsites_low.vcf.gz
+
+
+bcftools concat rightwhale_NC_083716.1_high.vcf.gz rightwhale_NC_083717.1_high.vcf.gz rightwhale_NC_083718.1_high.vcf.gz rightwhale_NC_083719.1_high.vcf.gz rightwhale_NC_083720.1_high.vcf.gz rightwhale_NC_083721.1_high.vcf.gz rightwhale_NC_083722.1_high.vcf.gz rightwhale_NC_083723.1_high.vcf.gz rightwhale_NC_083724.1_high.vcf.gz rightwhale_NC_083725.1_high.vcf.gz rightwhale_NC_083726.1_high.vcf.gz rightwhale_NC_083727.1_high.vcf.gz rightwhale_NC_083728.1_high.vcf.gz rightwhale_NC_083729.1_high.vcf.gz rightwhale_NC_083730.1_high.vcf.gz rightwhale_NC_083731.1_high.vcf.gz rightwhale_NC_083732.1_high.vcf.gz rightwhale_NC_083733.1_high.vcf.gz rightwhale_NC_083734.1_high.vcf.gz rightwhale_NC_083735.1_high.vcf.gz -Oz -o merged_rightwhale_raw_allsites_high.vcf.gz
+
