@@ -1,11 +1,4 @@
 #!/bin/bash
-#SBATCH --account=def-pbentzen
-#SBATCH --job-name=trim_map
-#SBATCH --array=2,3,5,9
-#SBATCH --output=%x-%a-%j.out
-#SBATCH --mem-per-cpu=10G
-#SBATCH --cpus-per-task=15
-#SBATCH --time=24:00:00
 
 ################################################################
 # Load data file and relevant information needed for each sample
@@ -51,6 +44,20 @@ java -Xmx9G -jar $EBROOTTRIMMOMATIC/trimmomatic-0.41.jar PE -threads 14 -phred33
     ${SPECIES}_${SAMPLE}_RUP_low.fq.gz \
     ILLUMINACLIP:adapters.fa:2:30:10 LEADING:20 SLIDINGWINDOW:4:20 \
     MINLEN:36
+    
+#########################################
+# Run Trimmomatic for mid filters 'mid'
+#########################################
+
+java -Xmx9G -jar $EBROOTTRIMMOMATIC/trimmomatic-0.41.jar PE -threads 14 -phred33 \
+    ${SAMPLE}_1.fastq.gz \
+    ${SAMPLE}_2.fastq.gz \
+    ${SPECIES}_${SAMPLE}_FP_mid.fq.gz \
+    ${SPECIES}_${SAMPLE}_FUP_mid.fq.gz \
+    ${SPECIES}_${SAMPLE}_RP_mid.fq.gz \
+    ${SPECIES}_${SAMPLE}_RUP_mid.fq.gz \
+    ILLUMINACLIP:adapters.fa:2:30:15 LEADING:20 SLIDINGWINDOW:5:25 \
+    AVGQUAL:25 MINLEN:36
 
 ##############################################
 # Run Trimmomatic for stringent filters 'high'
@@ -84,6 +91,16 @@ rm ${SPECIES}_${SAMPLE}_paired_low.sam
 bwa mem -M -t 15 \
  -R '@RG\tID:${SAMPLE}\tSM:${SAMPLE}\tLB:${SPECIES}\tCN:NCBI\tPL:ILLUMINA' \
   ${REFERENCE} \
+  ${SPECIES}_${SAMPLE}_FP_mid.fq.gz \
+  ${SPECIES}_${SAMPLE}_RP_mid.fq.gz > \
+  ${SPECIES}_${SAMPLE}_paired_mid.sam
+
+samtools sort -o ${SPECIES}_${SAMPLE}_paired_mid.bam ${SPECIES}_${SAMPLE}_paired_mid.sam
+rm ${SPECIES}_${SAMPLE}_paired_mid.sam
+
+bwa mem -M -t 15 \
+ -R '@RG\tID:${SAMPLE}\tSM:${SAMPLE}\tLB:${SPECIES}\tCN:NCBI\tPL:ILLUMINA' \
+  ${REFERENCE} \
   ${SPECIES}_${SAMPLE}_FP_high.fq.gz \
   ${SPECIES}_${SAMPLE}_RP_high.fq.gz > \
   ${SPECIES}_${SAMPLE}_paired_high.sam
@@ -110,6 +127,12 @@ java -Xmx9G -jar $EBROOTPICARD/picard.jar MarkDuplicates \
   --INPUT ${SPECIES}_${SAMPLE}_paired_low.bam \
   --OUTPUT ${SPECIES}_${SAMPLE}_paired-nodups_low.bam \
   --METRICS_FILE ${SPECIES}_${SAMPLE}_paired-nodups_low.metrics
+  
+java -Xmx9G -jar $EBROOTPICARD/picard.jar MarkDuplicates \
+  --REMOVE_DUPLICATES true --CREATE_INDEX true \
+  --INPUT ${SPECIES}_${SAMPLE}_paired_mid.bam \
+  --OUTPUT ${SPECIES}_${SAMPLE}_paired-nodups_mid.bam \
+  --METRICS_FILE ${SPECIES}_${SAMPLE}_paired-nodups_mid.metrics
 
 java -Xmx9G -jar $EBROOTPICARD/picard.jar MarkDuplicates \
   --REMOVE_DUPLICATES true --CREATE_INDEX true \

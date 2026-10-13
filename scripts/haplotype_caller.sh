@@ -39,6 +39,13 @@ gatk --java-options "-Xmx24g" HaplotypeCaller \
   -O ../vcf/${SAMPLE}_${SCAFFOLD}_high_whole.g.vcf.gz \
   -ERC GVCF \
   -L ${SCAFFOLD}
+  
+gatk --java-options "-Xmx24g" HaplotypeCaller \
+  -R ../reference/GCF_902167405.1_gadMor3.0_genomic.fna \
+  -I cod_${SAMPLE}_paired-nodups_mid.bam \
+  -O ../vcf/${SAMPLE}_${SCAFFOLD}_mid_whole.g.vcf.gz \
+  -ERC GVCF \
+  -L ${SCAFFOLD}
 
 gatk --java-options "-Xmx24g" HaplotypeCaller \
   -R ../reference/GCF_902167405.1_gadMor3.0_genomic.fna \
